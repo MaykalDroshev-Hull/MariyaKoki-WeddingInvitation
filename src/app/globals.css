@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f6f2;
+  --foreground: #473637;
+  --paper: #fcfbf8;
+  --line: #a18680;
+  --accent: #5f4b4c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-cormorant);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-cormorant), serif;
+  letter-spacing: 0.01em;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.3rem;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: transform 220ms ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 600ms ease,
+    transform 600ms ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.paper-card {
+  background: color-mix(in srgb, var(--paper) 80%, white);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--line) 8%, transparent);
+}
+
+.countdown-cell {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--paper) 90%, white),
+    color-mix(in srgb, var(--paper) 75%, white)
+  );
+}
+
+.floating-ornament {
+  animation: floatY 5.2s ease-in-out infinite;
+}
+
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.hero-scroll-arrow {
+  animation: hero-arrow-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes hero-arrow-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(0.45rem);
+  }
+}
+
+.click-heart-anchor {
+  transform: translate(-50%, -50%);
+}
+
+.click-heart-animate {
+  animation: click-heart-pop 1s ease-out forwards;
+}
+
+@keyframes click-heart-pop {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--heart-rot, 0deg)) scale(0.25);
+  }
+  18% {
+    opacity: 1;
+    transform: rotate(var(--heart-rot, 0deg)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--heart-rot, 0deg) + 6deg)) translateY(-36px)
+      scale(0.92);
+  }
+}
+
+@keyframes click-heart-fade {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .floating-ornament {
+    animation: none;
+  }
+
+  .hero-scroll-arrow {
+    animation: none;
+  }
+
+  .click-heart-animate {
+    animation: click-heart-fade 0.35s ease-out forwards;
+  }
+}
