@@ -31,7 +31,12 @@ body {
   letter-spacing: 0.01em;
 }
 
-button,
+/* Buttons: only inherit family so Tailwind text-* / font-* utilities are not overridden
+   (full `font: inherit` is unlayered and wins over @layer utilities). */
+button {
+  font-family: inherit;
+}
+
 input,
 textarea,
 select {

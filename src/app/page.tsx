@@ -649,8 +649,8 @@ export default function Home() {
 
         <section id="qna" className="reveal space-y-8" data-reveal>
           <div className="text-center">
-            <p className="text-xl uppercase tracking-[0.2em] md:text-2xl">Q&A</p>
-            <h2 className="mt-3 text-5xl md:text-6xl">Въпроси и отговори</h2>
+            <p className="text-2xl uppercase tracking-[0.2em] md:text-3xl">Q&A</p>
+            <h2 className="mt-3 text-6xl md:text-7xl">Въпроси и отговори</h2>
           </div>
           <div className="space-y-4">
             {qnaItems.map((item, index) => {
@@ -660,10 +660,10 @@ export default function Home() {
                 : { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const };
 
               return (
-                <div key={item.question} className="paper-card rounded-2xl p-6 md:p-8">
+                <div key={item.question} className="paper-card rounded-2xl p-6 md:p-10">
                   <button
                     type="button"
-                    className="flex w-full cursor-pointer items-start justify-between gap-4 text-left text-3xl"
+                    className="flex w-full cursor-pointer items-start justify-between gap-4 text-left text-3xl leading-tight md:text-4xl"
                     onClick={() => {
                       setOpenQnaIndex((prev) => (prev === index ? null : index));
                     }}
@@ -679,7 +679,7 @@ export default function Home() {
                       animate={{ rotate: isOpen ? 180 : 0 }}
                       transition={qnaTransition}
                     >
-                      <ChevronDown className="size-8" strokeWidth={2} />
+                      <ChevronDown className="size-8 shrink-0 md:size-9" strokeWidth={2} />
                     </motion.span>
                   </button>
                   <motion.div
@@ -696,7 +696,7 @@ export default function Home() {
                     transition={qnaTransition}
                     style={{ overflow: "hidden" }}
                   >
-                    <p className="pt-4 text-2xl leading-relaxed opacity-90">
+                    <p className="pt-4 text-2xl leading-relaxed opacity-90 md:text-3xl md:leading-relaxed">
                       {item.answer}
                     </p>
                   </motion.div>
