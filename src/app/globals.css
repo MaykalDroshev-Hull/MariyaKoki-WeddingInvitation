@@ -6,6 +6,16 @@
   --paper: #fcfbf8;
   --line: #a18680;
   --accent: #5f4b4c;
+  /* 646px–767px wide: hero height as a fraction of dynamic viewport. */
+  --hero-mobile-height-fraction: 0.92;
+  /*
+    ≤645px wide: linear min-height vs 100vw.
+    Anchors: 430px → 550px (iPhone 14 Pro Max portrait); 645px → 650px.
+  */
+  --hero-narrow-width-min: 430px;
+  --hero-narrow-width-max: 645px;
+  --hero-narrow-height-at-min: 550px;
+  --hero-narrow-height-at-max: 650px;
 }
 
 @theme inline {
@@ -30,6 +40,21 @@ select {
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Under 650px width: offset fixed header (--site-header-height from JS). */
+.site-shell {
+  padding-top: 0;
+}
+
+@media (max-width: 649px) {
+  .site-shell {
+    padding-top: var(--site-header-height, 4.75rem);
+  }
+
+  html {
+    scroll-padding-top: var(--site-header-height, 4.75rem);
+  }
 }
 
 .nav-link {
@@ -89,6 +114,55 @@ html {
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+
+.hero-block-height {
+  min-height: calc(100dvh * var(--hero-mobile-height-fraction) - 2.25rem);
+}
+
+@media (max-width: 645px) {
+  .hero-block-height {
+    min-height: clamp(
+      var(--hero-narrow-height-at-min),
+      calc(
+        var(--hero-narrow-height-at-min) +
+          (100vw - var(--hero-narrow-width-min)) *
+            (var(--hero-narrow-height-at-max) - var(--hero-narrow-height-at-min)) /
+            (var(--hero-narrow-width-max) - var(--hero-narrow-width-min))
+      ),
+      var(--hero-narrow-height-at-max)
+    );
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-block-height {
+    min-height: calc(100dvh - 2.25rem);
+  }
+}
+
+/*
+  Mobile hero zoom (only below 768px):
+  - With object-fit: contain, the whole photo is visible. Adjust --hero-mobile-zoom:
+    • 1 = default (full photo in frame)
+    • 1.06–1.15 = zoom in (crop edges; parent clips overflow)
+    • 0.9–0.98 = zoom out (smaller photo, more letterboxing)
+  Desktop ignores this (see md: block).
+*/
+.hero-photo {
+  --hero-mobile-zoom: 2;
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(var(--hero-mobile-zoom));
+  transform-origin: center center;
+}
+
+@media (min-width: 768px) {
+  .hero-photo {
+    object-fit: cover;
+    object-position: center 28%;
+    transform: none;
   }
 }
 
