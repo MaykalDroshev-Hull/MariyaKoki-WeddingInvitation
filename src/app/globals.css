@@ -14,7 +14,7 @@
   */
   --hero-narrow-width-min: 430px;
   --hero-narrow-width-max: 645px;
-  --hero-narrow-height-at-min: 550px;
+  --hero-narrow-height-at-min: 510px;
   --hero-narrow-height-at-max: 650px;
 }
 
@@ -93,14 +93,6 @@ html {
 .paper-card {
   background: color-mix(in srgb, var(--paper) 80%, white);
   box-shadow: 0 12px 40px color-mix(in srgb, var(--line) 8%, transparent);
-}
-
-.countdown-cell {
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--paper) 90%, white),
-    color-mix(in srgb, var(--paper) 75%, white)
-  );
 }
 
 .floating-ornament {

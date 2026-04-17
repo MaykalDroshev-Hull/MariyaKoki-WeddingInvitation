@@ -38,10 +38,10 @@ function PolaroidCardFace({ image }: { image: PolaroidImage }) {
           alt={image.alt ?? image.caption}
           width={1280}
           height={852}
-          className="h-[11rem] w-full object-cover pb-6 sm:h-[13rem] md:h-[22rem] md:pb-16 lg:h-[24rem]"
+          className="h-[13.2rem] w-full object-cover pb-6 sm:h-[15.6rem] md:h-[22rem] md:pb-16 lg:h-[24rem]"
         />
       ) : (
-        <div className="flex h-[11rem] w-full items-center justify-center bg-gradient-to-br from-[#f6f3ed] to-[#ebe4d8] pb-6 text-center text-base text-[#4e3d3d]/75 sm:h-[13rem] sm:text-lg md:h-[22rem] md:pb-16 md:text-3xl lg:h-[24rem] lg:text-4xl">
+        <div className="flex h-[13.2rem] w-full items-center justify-center bg-gradient-to-br from-[#f6f3ed] to-[#ebe4d8] pb-6 text-center text-base text-[#4e3d3d]/75 sm:h-[15.6rem] sm:text-lg md:h-[22rem] md:pb-16 md:text-3xl lg:h-[24rem] lg:text-4xl">
           3:2 Photo Placeholder
         </div>
       )}
@@ -213,7 +213,7 @@ export default function PolaroidStack({ images }: PolaroidStackProps) {
         {items.map((image, index) => (
           <div
             key={`${image.caption}-${index}`}
-            className="paper-card w-full max-w-[min(100%,22rem)] rounded-sm bg-white p-3 shadow-xl sm:max-w-md sm:p-4 md:max-w-4xl md:p-8 md:shadow-2xl"
+            className="paper-card w-full max-w-[min(100%,26.4rem)] rounded-sm bg-white p-3 shadow-xl sm:max-w-md sm:p-4 md:max-w-4xl md:p-8 md:shadow-2xl"
           >
             <PolaroidCardFace image={image} />
           </div>
@@ -224,12 +224,12 @@ export default function PolaroidStack({ images }: PolaroidStackProps) {
 
   return (
     <div ref={rootRef} className="polaroid-gsap-root relative w-full">
-      <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-[min(100%,22rem)] items-center justify-center px-2 py-6 sm:max-w-md md:max-w-[40rem] md:px-3 md:py-10 lg:max-w-[44rem]">
-        <div className="relative h-[min(460px,76dvh)] w-full max-w-[min(100%,20rem)] sm:h-[min(520px,78dvh)] sm:max-w-md md:h-[min(840px,85dvh)] md:max-w-[36rem] lg:h-[840px]">
+      <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-[min(100%,26.4rem)] items-center justify-center px-2 py-6 sm:max-w-md md:max-w-[40rem] md:px-3 md:py-10 lg:max-w-[44rem]">
+        <div className="relative h-[min(552px,91dvh)] w-full max-w-[min(100%,24rem)] sm:h-[min(624px,94dvh)] sm:max-w-md md:h-[min(840px,85dvh)] md:max-w-[36rem] lg:h-[840px]">
           {items.map((image, index) => (
             <div
               key={`${image.caption}-${index}`}
-              className="polaroid-gsap-card w-full max-w-[min(100%,20rem)] will-change-transform sm:max-w-md md:max-w-[36rem]"
+              className="polaroid-gsap-card w-full max-w-[min(100%,24rem)] will-change-transform sm:max-w-md md:max-w-[36rem]"
             >
               <div className="paper-card rounded-sm bg-white p-3 shadow-xl sm:p-4 md:p-6 md:shadow-2xl lg:p-8">
                 <PolaroidCardFace image={image} />

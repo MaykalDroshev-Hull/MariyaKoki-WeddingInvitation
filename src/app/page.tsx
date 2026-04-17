@@ -4,21 +4,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import {
   FormEvent,
+  Fragment,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import {
-  Cake,
-  ChevronDown,
-  Heart,
-  HeartHandshake,
-  Sparkles,
-  Wine,
-  X,
-} from "lucide-react";
+import { ChevronDown, Heart, X } from "lucide-react";
 import PolaroidStack from "@/components/PolaroidStack";
 
 const heroImageSrc = "/images/image%20(4).avif";
@@ -48,7 +41,6 @@ const navItems = [
   { id: "schedule", label: "Програма" },
   { id: "details", label: "Детайли" },
   { id: "qna", label: "Въпроси" },
-  { id: "rsvp", label: "RSVP" },
 ];
 
 const timelineItems = [
@@ -62,22 +54,35 @@ const timelineItems = [
 ];
 
 
-const timelineIconClass =
-  "w-10 h-10 md:w-12 md:h-12 shrink-0 stroke-[1.25] text-[color:var(--accent)]/80";
+const TIMELINE_SVG: Record<string, string> = {
+  rings: "/icons/rings.svg",
+  champagne: "/icons/cheers.svg",
+  cake: "/icons/cake.svg",
+  hearts: "/icons/hearts.svg",
+};
 
 function TimelineIcon({ icon }: { icon: string }) {
-  switch (icon) {
-    case "rings":
-      return <Sparkles className={timelineIconClass} aria-hidden />;
-    case "champagne":
-      return <Wine className={timelineIconClass} aria-hidden />;
-    case "cake":
-      return <Cake className={timelineIconClass} aria-hidden />;
-    case "hearts":
-      return <HeartHandshake className={timelineIconClass} aria-hidden />;
-    default:
-      return null;
+  const src = TIMELINE_SVG[icon];
+  if (!src) {
+    return null;
   }
+
+  return (
+    <div
+      className="h-10 w-10 shrink-0 bg-[color:color-mix(in_srgb,var(--accent)_80%,transparent)] md:h-12 md:w-12"
+      style={{
+        maskImage: `url(${src})`,
+        WebkitMaskImage: `url(${src})`,
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+      }}
+      aria-hidden
+    />
+  );
 }
 
 function HeartDot() {
@@ -502,7 +507,15 @@ export default function Home() {
             <p className="text-2xl uppercase tracking-[0.28em] md:text-3xl">
               M &amp; K
             </p>
-            <div className="my-8 h-px w-40 bg-[color:color-mix(in_srgb,var(--line)_50%,transparent)]" />
+            <div className="relative mx-auto my-6 aspect-[3/4] w-full max-w-[min(100%,19rem)] overflow-hidden rounded-2xl shadow-md ring-1 ring-black/[0.06] sm:max-w-[min(100%,20rem)]">
+              <Image
+                src="/images/image%20(3).avif"
+                alt="Мария и Калоян"
+                fill
+                sizes="(max-width: 768px) 78vw, 20rem"
+                className="object-cover"
+              />
+            </div>
             <p className="max-w-xs text-3xl leading-tight md:max-w-sm md:text-4xl">
               Любов, обещания и спомени, които започват оттук.
             </p>
@@ -514,7 +527,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="reveal grid items-center gap-8 md:grid-cols-[1.1fr_0.9fr]" data-reveal>
+        <section className="reveal" data-reveal>
           <div className="paper-card rounded-3xl p-8 md:p-10">
             <p className="text-center text-2xl uppercase tracking-[0.16em] md:text-3xl">
               Ще се радваме да споделите този ден с нас
@@ -524,18 +537,6 @@ export default function Home() {
             </p>
             <p className="mx-auto mt-6 max-w-xl text-center text-2xl leading-relaxed md:text-3xl">
               Използвайте секцията RSVP в края на страницата, за да ни пишете бързо и лесно.
-            </p>
-          </div>
-          <div className="paper-card flex min-h-[16rem] flex-col justify-center rounded-3xl p-8 md:min-h-[20rem] md:p-10">
-            <p className="text-4xl leading-tight md:text-5xl">
-              Очакваме с нетърпение да бъдете част от нашия ден.
-            </p>
-            <p className="mt-5 text-2xl leading-relaxed opacity-80 md:text-3xl">
-              Потвърдете присъствието си и ще получите допълнителни детайли за
-              локация, паркинг и настаняване.
-            </p>
-            <p className="mt-6 text-3xl tracking-[0.08em] md:text-4xl">
-              RSVP до 01.06.2026
             </p>
           </div>
         </section>
@@ -560,19 +561,29 @@ export default function Home() {
               Денят настъпи. Очакваме Ви с много усмивки и любов.
             </p>
           ) : (
-            <div className="grid grid-cols-4 gap-3 md:gap-4">
-              {countdownItems.map((item) => (
-                <div key={item.label} className="countdown-cell rounded-2xl p-3 md:p-8">
-                  <div
-                    className="text-3xl font-semibold md:text-7xl"
-                    suppressHydrationWarning
-                  >
-                    {formatValue(item.value)}
+            <div className="flex flex-wrap items-end justify-center gap-x-1 md:gap-x-3">
+              {countdownItems.map((item, index) => (
+                <Fragment key={item.label}>
+                  <div className="flex min-w-[3.75rem] flex-col items-center sm:min-w-[4.5rem] md:min-w-[6rem]">
+                    <div
+                      className="text-4xl font-semibold tabular-nums sm:text-5xl md:text-7xl"
+                      suppressHydrationWarning
+                    >
+                      {formatValue(item.value)}
+                    </div>
+                    <div className="mt-1 text-sm tracking-[0.08em] uppercase md:mt-2 md:text-3xl md:tracking-[0.12em]">
+                      {item.label}
+                    </div>
                   </div>
-                  <div className="mt-1 text-xs tracking-[0.08em] uppercase md:mt-2 md:text-3xl md:tracking-[0.12em]">
-                    {item.label}
-                  </div>
-                </div>
+                  {index < countdownItems.length - 1 ? (
+                    <span
+                      className="mb-7 select-none text-3xl font-extralight leading-none text-[color:color-mix(in_srgb,var(--foreground)_40%,transparent)] md:mb-10 md:text-5xl"
+                      aria-hidden
+                    >
+                      :
+                    </span>
+                  ) : null}
+                </Fragment>
               ))}
             </div>
           )}
@@ -581,7 +592,6 @@ export default function Home() {
         <section id="schedule" className="reveal space-y-8" data-reveal>
           <div className="text-center">
             <p className="text-xl uppercase tracking-[0.2em] md:text-2xl">Програма на деня</p>
-            <h2 className="mt-3 text-5xl md:text-6xl">Ловеч</h2>
           </div>
           <div className="paper-card mx-auto max-w-3xl rounded-3xl p-8 md:p-12">
             <div className="relative">
@@ -696,6 +706,29 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="love-quote" className="reveal" data-reveal>
+          <div className="relative mx-auto w-full max-w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/[0.08] md:max-w-xl">
+            <div className="relative aspect-[4/5] w-full">
+              <Image
+                src="/images/image%20(6).avif"
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 576px"
+                className="object-cover"
+              />
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-gradient-to-b from-black/55 via-black/25 to-transparent"
+                aria-hidden
+              />
+              <div className="absolute left-0 top-0 z-10 flex h-[30%] w-full min-w-0 items-start justify-start overflow-x-auto overflow-y-hidden px-4 pt-5 text-left md:px-8 md:pt-7 lg:px-10 lg:pt-9">
+                <blockquote className="shrink-0 whitespace-nowrap text-2xl font-normal italic leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] sm:text-3xl md:text-2xl md:leading-tight lg:text-3xl">
+                  „В теб намерих дома си.“
+                </blockquote>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="rsvp" className="reveal space-y-8 pb-12" data-reveal>
           <div className="text-center">
             <p className="text-xl uppercase tracking-[0.2em] md:text-2xl">RSVP</p>
@@ -766,6 +799,20 @@ export default function Home() {
           </form>
         </section>
       </main>
+
+      <footer className="mx-auto w-full max-w-6xl px-6 pb-10 pt-6 text-center md:px-10 md:pb-12 md:pt-8">
+        <p className="text-sm text-[color:color-mix(in_srgb,var(--foreground)_42%,transparent)] md:text-base">
+          Изработено от{" "}
+          <a
+            href="https://www.hmwspro.com/bg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[color:color-mix(in_srgb,var(--foreground)_62%,transparent)] underline decoration-[color:color-mix(in_srgb,var(--foreground)_28%,transparent)] underline-offset-2 transition hover:text-[color:var(--foreground)] hover:decoration-[color:color-mix(in_srgb,var(--foreground)_55%,transparent)]"
+          >
+            H&amp;M WS Pro
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
