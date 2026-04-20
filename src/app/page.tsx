@@ -145,7 +145,7 @@ const polaroids = [
     caption: "Нашето приключение",
     subtitle: "Смях, музика и спомени по пътя.",
   },
-  {
+  { 
     src: heroPolaroid3Src,
     alt: "Предложението",
     caption: "Предложението",
