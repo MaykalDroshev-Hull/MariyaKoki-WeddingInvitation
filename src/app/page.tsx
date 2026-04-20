@@ -14,7 +14,7 @@ import {
 import { ChevronDown, Heart, X } from "lucide-react";
 import PolaroidStack from "@/components/PolaroidStack";
 
-const heroImageSrc = "/images/image%20(4).avif";
+const heroPolaroid3Src = "/images/hero-polaroid%203.avif";
 
 type Countdown = {
   days: number;
@@ -135,18 +135,18 @@ const qnaItems = [
 const polaroids = [
   {
     src: "/images/image%20(8).avif",
-    alt: "Първа среща",
-    caption: "Първа среща",
+    alt: "Любов в кадър",
+    caption: "Любов в кадър",
     subtitle: "Един обикновен ден, който промени всичко.",
   },
   {
-    src: "/images/image%20(15).avif",
-    alt: "Първо пътуване",
-    caption: "Първо пътуване",
+    src: "/images/polaroid%202.avif",
+    alt: "Нашето приключение",
+    caption: "Нашето приключение",
     subtitle: "Смях, музика и спомени по пътя.",
   },
   {
-    src: "/images/image%20(4).avif",
+    src: heroPolaroid3Src,
     alt: "Предложението",
     caption: "Предложението",
     subtitle: "„Да“ преди голямото „ДА“.",
@@ -158,10 +158,10 @@ const polaroids = [
     subtitle: "Следващата глава започва на 26.06.2026.",
   },
   {
-    src: "/images/image%20(15).avif",
-    alt: "Заедно напред",
-    caption: "Заедно напред",
-    subtitle: "С любов към общото ни утре.",
+    src: "/images/Hero%205.avif",
+    alt: "Очакваме ви с нашите кумове",
+    caption: "Очакваме ви с нашите кумове",
+    subtitle: "Да споделим празника заедно — чакаме ви с нетърпение.",
   },
 ];
 
@@ -441,7 +441,7 @@ export default function Home() {
           />
           <div className="pointer-events-none absolute inset-0">
             <Image
-              src={heroImageSrc}
+              src={heroPolaroid3Src}
               alt="Мария и Калоян"
               fill
               priority
@@ -509,7 +509,7 @@ export default function Home() {
             </p>
             <div className="relative mx-auto my-6 aspect-[3/4] w-full max-w-[min(100%,19rem)] overflow-hidden rounded-2xl shadow-md ring-1 ring-black/[0.06] sm:max-w-[min(100%,20rem)]">
               <Image
-                src="/images/image%20(3).avif"
+                src="/images/under%20hero.avif"
                 alt="Мария и Калоян"
                 fill
                 sizes="(max-width: 768px) 78vw, 20rem"
