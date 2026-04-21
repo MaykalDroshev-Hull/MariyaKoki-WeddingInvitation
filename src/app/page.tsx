@@ -522,8 +522,7 @@ export default function Home() {
                   />
                 </span>
                 <span className="text-[10px] font-normal uppercase tracking-[0.28em] md:text-xs">
-                  Прокрете надолу
-                </span>
+                  </span>
               </a>
             </div>
           </div>
