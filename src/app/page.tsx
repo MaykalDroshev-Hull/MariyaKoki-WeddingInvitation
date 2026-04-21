@@ -25,11 +25,19 @@ type Countdown = {
 };
 
 const weddingDate = new Date("2026-06-26T00:00:00+03:00");
-/** Bulgarian mobile (national digits, e.g. 0888123456). Replace with your real number. */
-const RSVP_PHONE = "0888123456";
+/** Bulgarian mobile numbers (national digits, e.g. 0888123456). */
+const RSVP_CONTACTS = [
+  { name: "Мария", phone: "0885055969" },
+  { name: "Калоян", phone: "0887468185" },
+] as const;
+const RSVP_PHONE = RSVP_CONTACTS[0].phone;
+
+function toTelDigits(phone: string): string {
+  return phone.replace(/\D/g, "");
+}
 
 function rsvpSmsHref(body: string): string {
-  const digits = RSVP_PHONE.replace(/\D/g, "");
+  const digits = toTelDigits(RSVP_PHONE);
   const smsTarget =
     digits.length === 10 && digits.startsWith("0") ? `+359${digits.slice(1)}` : digits;
   return `sms:${smsTarget}?body=${encodeURIComponent(body)}`;
@@ -40,7 +48,6 @@ const navItems = [
   { id: "countdown", label: "Отброяване" },
   { id: "schedule", label: "Програма" },
   { id: "details", label: "Детайли" },
-  { id: "qna", label: "Въпроси" },
 ];
 
 const timelineItems = [
@@ -95,40 +102,33 @@ function HeartDot() {
   );
 }
 
-const detailItems = [
+type DetailItem = {
+  title: string;
+  text?: string;
+  items?: string[];
+};
+
+const detailItems: DetailItem[] = [
   {
     title: "Дрескод",
-    text: "Елегантен и комфортен. Нежни, пастелни и земни тонове ще се впишат чудесно.",
+    items: [
+      "Елегантен и комфортен",
+      "Тържеството ще бъде на открито — препоръчваме връхна дреха",
+    ],
   },
   {
     title: "Локация",
-    text: "Церемония и вечеря в Ловеч. Пълен адрес и карта ще изпратим след потвърждение.",
+    items: [
+      "Граждански брак — Младежки дом Ловеч",
+      "Ресторант — „Ponte“",
+    ],
   },
   {
     title: "Подарък",
-    text: "Най-големият подарък е Вашето присъствие. Ако желаете, може да ни зарадвате с картичка.",
-  },
-];
-
-const qnaItems = [
-  {
-    question: "Мога ли да доведа дете?",
-    answer:
-      "Ще се радваме да споделим деня с всички близки. При RSVP отбележете възрастта на детето, за да подготвим удобно място.",
-  },
-  {
-    question: "Има ли паркинг?",
-    answer:
-      "Да, до ресторанта има осигурени паркоместа за гости. Ще получите указания с потвърждението.",
-  },
-  {
-    question: "До кога да потвърдя присъствие?",
-    answer: "Моля потвърдете до 01.06.2026, за да организираме местата и менюто.",
-  },
-  {
-    question: "Какво да направя при хранителен режим?",
-    answer:
-      "В полето „Съобщение“ в RSVP ни напишете предпочитанията си и ще се погрижим.",
+    items: [
+      "Вашето присъствие е най-ценният подарък",
+      "Плик с пожелания е повече от достатъчно",
+    ],
   },
 ];
 
@@ -137,7 +137,7 @@ const polaroids = [
     src: "/images/image%20(8).avif",
     alt: "Любов в кадър",
     caption: "Любов в кадър",
-    subtitle: "Един обикновен ден, който промени всичко.",
+    subtitle: "Истински чувства, уловени във времето.",
   },
   {
     src: "/images/polaroid%202.avif",
@@ -159,9 +159,9 @@ const polaroids = [
   },
   {
     src: "/images/Hero%205.avif",
-    alt: "Очакваме ви с нашите кумове",
+    alt: "До нас в най-важния ден, кумуват сем. Иванови",
     caption: "Очакваме ви с нашите кумове",
-    subtitle: "Да споделим празника заедно — чакаме ви с нетърпение.",
+    subtitle: "До нас в най-важния ден, кумуват сем. Иванови.",
   },
 ];
 
@@ -194,7 +194,10 @@ export default function Home() {
   const [rsvpGuests, setRsvpGuests] = useState("2");
   const [rsvpPhone, setRsvpPhone] = useState("");
   const [rsvpMessage, setRsvpMessage] = useState("");
-  const [openQnaIndex, setOpenQnaIndex] = useState<number | null>(null);
+  const [rsvpStatus, setRsvpStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [rsvpError, setRsvpError] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -296,10 +299,8 @@ export default function Home() {
     [countdown],
   );
 
-  const onRsvpSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const body = [
+  const buildRsvpSmsBody = () =>
+    [
       "Здравейте,",
       "",
       "Потвърждавам присъствие за сватбата на Мария и Калоян.",
@@ -313,7 +314,53 @@ export default function Home() {
       rsvpName || "Ваш гост",
     ].join("\n");
 
-    window.location.href = rsvpSmsHref(body);
+  const onRsvpSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (rsvpStatus === "submitting") {
+      return;
+    }
+
+    setRsvpStatus("submitting");
+    setRsvpError(null);
+
+    try {
+      const response = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: rsvpName,
+          guests: rsvpGuests,
+          phone: rsvpPhone,
+          message: rsvpMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      setRsvpStatus("success");
+      setRsvpName("");
+      setRsvpGuests("2");
+      setRsvpPhone("");
+      setRsvpMessage("");
+    } catch (error) {
+      console.error("RSVP submission failed:", error);
+      setRsvpError(
+        "Възникна грешка при изпращането. Моля, опитайте отново или ни се обадете директно.",
+      );
+      setRsvpStatus("error");
+    }
+  };
+
+  const onRsvpSmsClick = () => {
+    window.location.href = rsvpSmsHref(buildRsvpSmsBody());
+  };
+
+  const resetRsvp = () => {
+    setRsvpStatus("idle");
+    setRsvpError(null);
   };
 
   const scrollToTop = () => {
@@ -641,68 +688,22 @@ export default function Home() {
             {detailItems.map((item) => (
               <article key={item.title} className="paper-card rounded-2xl p-6 md:p-8">
                 <h3 className="text-4xl">{item.title}</h3>
-                <p className="mt-3 text-2xl leading-relaxed">{item.text}</p>
+                {item.items ? (
+                  <ul className="mt-3 space-y-2 text-2xl leading-relaxed">
+                    {item.items.map((entry) => (
+                      <li key={entry} className="flex items-start gap-3">
+                        <span className="mt-2 flex shrink-0">
+                          <HeartDot />
+                        </span>
+                        <span>{entry}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-2xl leading-relaxed">{item.text}</p>
+                )}
               </article>
             ))}
-          </div>
-        </section>
-
-        <section id="qna" className="reveal space-y-8" data-reveal>
-          <div className="text-center">
-            <p className="text-2xl uppercase tracking-[0.2em] md:text-3xl">Q&A</p>
-            <h2 className="mt-3 text-6xl md:text-7xl">Въпроси и отговори</h2>
-          </div>
-          <div className="space-y-4">
-            {qnaItems.map((item, index) => {
-              const isOpen = openQnaIndex === index;
-              const qnaTransition = prefersReducedMotion
-                ? { duration: 0 }
-                : { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const };
-
-              return (
-                <div key={item.question} className="paper-card rounded-2xl p-6 md:p-10">
-                  <button
-                    type="button"
-                    className="flex w-full cursor-pointer items-start justify-between gap-4 text-left text-3xl leading-tight md:text-4xl"
-                    onClick={() => {
-                      setOpenQnaIndex((prev) => (prev === index ? null : index));
-                    }}
-                    aria-expanded={isOpen}
-                    aria-controls={`qna-answer-${index}`}
-                    id={`qna-question-${index}`}
-                  >
-                    <span>{item.question}</span>
-                    <motion.span
-                      aria-hidden
-                      className="mt-1 shrink-0 text-[color:var(--accent)]"
-                      initial={false}
-                      animate={{ rotate: isOpen ? 180 : 0 }}
-                      transition={qnaTransition}
-                    >
-                      <ChevronDown className="size-8 shrink-0 md:size-9" strokeWidth={2} />
-                    </motion.span>
-                  </button>
-                  <motion.div
-                    id={`qna-answer-${index}`}
-                    role="region"
-                    aria-labelledby={`qna-question-${index}`}
-                    aria-hidden={!isOpen}
-                    inert={!isOpen}
-                    initial={false}
-                    animate={{
-                      height: isOpen ? "auto" : 0,
-                      opacity: isOpen ? 1 : 0,
-                    }}
-                    transition={qnaTransition}
-                    style={{ overflow: "hidden" }}
-                  >
-                    <p className="pt-4 text-2xl leading-relaxed opacity-90 md:text-3xl md:leading-relaxed">
-                      {item.answer}
-                    </p>
-                  </motion.div>
-                </div>
-              );
-            })}
           </div>
         </section>
 
@@ -734,9 +735,31 @@ export default function Home() {
             <p className="text-xl uppercase tracking-[0.2em] md:text-2xl">RSVP</p>
             <h2 className="mt-3 text-5xl md:text-6xl">Потвърдете присъствие</h2>
             <p className="mx-auto mt-4 max-w-3xl text-2xl md:text-3xl">
-              Формата ще отвори SMS с подготвен текст към нас.
+              Попълнете формата, за да ни изпратите потвърждение. Може и чрез SMS.
             </p>
           </div>
+          {rsvpStatus === "success" ? (
+            <div className="paper-card mx-auto max-w-4xl rounded-3xl p-8 text-center md:p-12">
+              <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] md:size-20">
+                <Heart
+                  className="size-9 fill-current text-[color:var(--accent)] md:size-11"
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
+              </div>
+              <h3 className="mt-6 text-5xl md:text-6xl">Благодарим Ви!</h3>
+              <p className="mx-auto mt-4 max-w-2xl text-2xl leading-relaxed md:text-3xl">
+                Получихме Вашето потвърждение. Ще се видим на 26.06.2026 — с нетърпение очакваме да споделим този ден с Вас.
+              </p>
+              <button
+                type="button"
+                onClick={resetRsvp}
+                className="mt-8 text-xl underline decoration-[color:color-mix(in_srgb,var(--foreground)_35%,transparent)] underline-offset-4 transition hover:opacity-80 md:text-2xl"
+              >
+                Изпрати още едно потвърждение
+              </button>
+            </div>
+          ) : (
           <form onSubmit={onRsvpSubmit} className="paper-card mx-auto grid max-w-4xl gap-5 rounded-3xl p-7 md:grid-cols-2 md:p-10">
             <label className="flex flex-col gap-2 text-2xl">
               Име и фамилия
@@ -780,23 +803,48 @@ export default function Home() {
                 placeholder="Алергии, предпочитания, специални нужди..."
               />
             </label>
-            <button
-              type="submit"
-              className="md:col-span-2 mt-2 rounded-xl bg-black px-6 py-4 text-center text-2xl text-white transition hover:bg-black/90"
-            >
-              Изпрати потвърждение
-            </button>
-            <p className="md:col-span-2 text-center text-xl opacity-70">
-              Ако желаете, може да ни пишете директно на{" "}
-              <a
-                href={`tel:${RSVP_PHONE.replace(/\D/g, "")}`}
-                className="underline decoration-[color:color-mix(in_srgb,var(--foreground)_35%,transparent)] underline-offset-2 transition hover:opacity-90"
+            <div className="md:col-span-2 mt-2 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="submit"
+                disabled={rsvpStatus === "submitting"}
+                className="flex-1 rounded-xl bg-black px-6 py-4 text-center text-2xl text-white transition hover:bg-black/90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {RSVP_PHONE}
-              </a>
-              .
-            </p>
+                {rsvpStatus === "submitting"
+                  ? "Изпращане..."
+                  : "Изпрати потвърждение"}
+              </button>
+              <button
+                type="button"
+                onClick={onRsvpSmsClick}
+                disabled={rsvpStatus === "submitting"}
+                className="flex-1 rounded-xl border border-black/70 px-6 py-4 text-center text-2xl text-black transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Изпрати чрез SMS
+              </button>
+            </div>
+            {rsvpStatus === "error" && rsvpError ? (
+              <p className="md:col-span-2 text-center text-xl text-[color:var(--accent)]">
+                {rsvpError}
+              </p>
+            ) : null}
+            <div className="md:col-span-2 text-center text-xl opacity-70">
+              <p>Ако желаете, може да ни пишете или да се обадите директно:</p>
+              <ul className="mt-2 flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-6">
+                {RSVP_CONTACTS.map((contact) => (
+                  <li key={contact.phone}>
+                    <span className="mr-2">{contact.name}</span>
+                    <a
+                      href={`tel:${toTelDigits(contact.phone)}`}
+                      className="underline decoration-[color:color-mix(in_srgb,var(--foreground)_35%,transparent)] underline-offset-2 transition hover:opacity-90"
+                    >
+                      {contact.phone}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </form>
+          )}
         </section>
       </main>
 
