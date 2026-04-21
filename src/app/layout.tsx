@@ -9,13 +9,27 @@ const cormorant = Cormorant_Garamond({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const siteTitle = "Мария и Калоян | Сватбена покана";
+const siteDescription =
+  "С радост Ви каним да отпразнуваме любовта си заедно на 26.06.2026.";
+
 export const metadata: Metadata = {
-  title: "Мария и Калоян | Сватбена покана",
-  description:
-    "С радост Ви каним да отпразнуваме любовта си заедно на 26.06.2026.",
+  title: siteTitle,
+  description: siteDescription,
   icons: {
     icon: [{ url: "/icons/hearts.svg", type: "image/svg+xml" }],
     shortcut: "/icons/hearts.svg",
+  },
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    type: "website",
+    locale: "bg_BG",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
   },
 };
 
